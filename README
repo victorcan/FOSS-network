@@ -8,7 +8,7 @@ Install Samba4 AD DC. Make sure to provision rfc2307.
 http://wiki.samba.org/index.php/Samba_AD_DC_HOWTO
 Configure shares. 
 https://wiki.samba.org/index.php/Setup_and_configure_file_shares
-Management: For the sake of simplicity use Microsoft RSAT tool
+Management: For the sake of simplicity use Microsoft RSAT tool. To make the AD account compatible with unix you must create the user/group and then: right click user/group > properties > unix tab to map the unix UID/GID.  
 
 LTSP
 Install diskless fat client functionality.
@@ -24,7 +24,9 @@ FreeRadius and Coova Chilli
 Authenticate users using single sign on credentials.
 http://deployingradius.com/documents/configuration/active_directory.html
 http://www.netclique.in/2013/07/campus-wi-fi-with-coovachilli.html
+My chilli file refers to /etc/chilli/config
 
 OwnCloud Server
+Install OwnCloud and configure in GUI
 http://software.opensuse.org/download.html?project=isv:ownCloud:community&package=owncloud
 
