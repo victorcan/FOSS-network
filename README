@@ -14,6 +14,8 @@ LTSP
 Install diskless fat client functionality.
 https://help.ubuntu.com/community/UbuntuLTSP/FatClients
 DHCP files should be located in /etc/ltsp/dhcpd.conf and /etc/dhcp/dhcpd.conf both must be configured inorder for ltsp to work.
+To install applications for the images
+http://www.havetheknowhow.com/Configure-the-server/Configure-LTSP.html
 
 LDAP client authentication
 Need this to authenticate LTSP clients using single sign on credentials provided by the SAMBA4 AD DC.
