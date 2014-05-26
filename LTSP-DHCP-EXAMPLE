@@ -1,0 +1,22 @@
+#
+# Default LTSP dhcpd.conf config file.
+#
+
+authoritative;
+
+subnet 192.168.2.0 netmask 255.255.255.0 {
+    range 192.168.2.20 192.168.2.250;
+    option domain-name "chu.nz";
+    option domain-name-servers 192.168.0.3, 8.8.8.8;
+    option broadcast-address 192.168.2.255;
+    option routers 192.168.2.1, 192.168.0.99;
+#    next-server 192.168.0.1;
+#    get-lease-hostnames true;
+    option subnet-mask 255.255.255.0;
+    option root-path "/opt/ltsp/i386";
+    if substring( option vendor-class-identifier, 0, 9 ) = "PXEClient" {
+        filename "/ltsp/i386/pxelinux.0";
+    } else {
+        filename "/ltsp/i386/nbi.img";
+    }
+}
