@@ -75,12 +75,38 @@ References:
 https://help.ubuntu.com/community/UbuntuLTSP/FatClients
 
 To install applications for the images
+Run:
+sudo cp /etc/apt/sources.list /opt/ltsp/i386/etc/apt/sources.list
+export LTSP_HANDLE_DAEMONS=false
+sudo chroot /opt/ltsp/i386
+mount -t proc proc /proc
+apt-get update
+Now at this point you want to install any client applications you want to see on you thin/fat clients.
+For example you want to install the owncloud client, you would run:
+apt-get install owncloud-client
+Note: If you dont have the respoitory you will need to go find it on the owncloud website!
+Once you're finished run:
+exit
+sudo umount /opt/ltsp/i386/proc
+sudo ltsp-update-sshkeys
+sudo ltsp-update-kernels
+sudo ltsp-update-image --arch i386
+
+References:
 http://www.havetheknowhow.com/Configure-the-server/Configure-LTSP.html
 
 LDAP client authentication
-Need this to authenticate LTSP clients using single sign on credentials provided by the SAMBA4 AD DC.
-https://help.ubuntu.com/community/LDAPClientAuthentication
+Need this to authenticate LTSP clients using single sign on credentials provided by the SAMBA4 DC.
+sudo apt-get install ldap-auth-client nscd
+sudo auth-client-config -t nss -p lac_ldap
+sudo pam-auth-update
+To automatically create home directories add the following line to your /etc/pam.d/common-session
+session required        pam_mkhomedir.so
 Also you must refer to my ldap.conf file inorder for it to work with SAMBA4 AD DC.
+
+References:
+https://help.ubuntu.com/community/LDAPClientAuthentication
+
 
 FreeRadius and Coova Chilli
 Authenticate users using single sign on credentials.
@@ -96,6 +122,8 @@ You can install the ldap backend feature under apps to use single sign on.
 Mounting shares using pam_mount
 sudo apt-get install libpam-mount
 sudo nano /etc/security/pam_mount.conf.xml
-https://wiki.ubuntu.com/MountWindowsSharesPermanently
 also refer to my conf file /etc/security/pam_mount.conf.xml
 My example allows users to access a public folder called Pool where they can place files for anyone on the network to see.
+
+References:
+https://wiki.ubuntu.com/MountWindowsSharesPermanently
