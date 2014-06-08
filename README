@@ -1,21 +1,79 @@
 This folder contains all my configuration files for the FOSS network computing infrastructure.
 Everything is installed on a single server.
 
-For the configuration trelated to the project plrase reffer to the project Wiki
-
 Below I would like to list references for how I setup everything:
 
 Samba4
-Install Samba4 AD DC. Make sure to provision rfc2307 and to visit the pre-requisites page. 
+Install Samba4 AD DC on Ubuntu 14.04 LTS. Make sure to provision rfc2307 and to visit the pre-requisites page.
+
+Pre-requisites:
+Your /etc/network/interfaces, /etc/hosts and /etc/hostname should look similar to the example files I have provided.
+Must enable ACL's for ext4 file system run: 
+nano /etc/fstab
+Add the following line after the ext4 file system should look something like: 
+/dev/...          /srv/samba/demo          ext4          user_xattr,acl,barrier=1          1 1
+then run: mount -a
+Now we need to install pre-requisites for Samba4 run:
+apt-get install build-essential libacl1-dev libattr1-dev \
+   libblkid-dev libgnutls-dev libreadline-dev python-dev libpam0g-dev \
+   python-dnspython gdb pkg-config libpopt-dev libldap2-dev \
+   dnsutils libbsd-dev attr krb5-user docbook-xsl libcups2-dev acl ntp
+Kerberos will prompt for details such as your domain and administrative servers.. I entered the IP of my server.
+
+Now we are ready to install Samba 4:
+On Ubuntu 14.04 LTS run apt-get install samba 
+After Samba4 has finished installing run the following provisioning command:
+samba-tool domain provision --use-rfc2307
+You will be prompted for details... Most by default are correct. Change DNS forwarder to 8.8.8.8 and use a password that contains atleast one capital letter, one number and seven charactors altogethor.
+You now have a fully functional DC! To start Samba4 run:
+sudo samba
+Test authentication using account made in provisioning:
+smbclient //localhost/netlogon -UAdministrator -c 'ls'
+Test DNS by running the following make sure you replace sandom.example.com with your own domain name: 
+host -t SRV _ldap._tcp.samdom.example.com.
+host -t SRV _kerberos._udp.samdom.example.com.
+host -t A dc1.samdom.example.com.
+The commands should output something like:
+_ldap._tcp.samdom.example.com has SRV record 0 100 389 dc1.samdom.example.com.
+_kerberos._udp.samdom.example.com has SRV record 0 100 88 dc1.samdom.example.com.
+dc1.samdom.example.com has address 192.168.1.1
+Otherwise you will need to go back and check your DNS settings.
+Test Kerberos noting that the domain is all CAPS:
+kinit administrator@SAMDOM.EXAMPLE.COM
+Run the following so your administrator account doesn't expire:
+/usr/local/samba/bin/samba-tool user setexpiry administrator --noexpiry 
+Configure NTP
+Add your ntp servers here /etc/ntp.conf
+To find ntp servers for NZ or anywhere else go to: http://www.pool.ntp.org/zone/nz
+Then run:
+service ntp stop 
+ntpdate 0.nz.pool.ntp.org
+ntpq -p
+
+References:
 http://wiki.samba.org/index.php/Samba_AD_DC_HOWTO
-Configure shares. 
+
+Configure shares.
+Refer to my smb.conf
+Also read:
 https://wiki.samba.org/index.php/Setup_and_configure_file_shares
 Management: For the sake of simplicity use Microsoft RSAT tool. To make the AD account compatible with unix you must using the RSAT tool ,create the user/group and then: right click user/group > properties > unix tab to map the unix UID/GID.  
 
 LTSP
 Install diskless fat client functionality.
-https://help.ubuntu.com/community/UbuntuLTSP/FatClients
+sudo apt-get install ltsp-server-standalone
+You can refer to my dhcpd.conf files
 DHCP files should be located in /etc/ltsp/dhcpd.conf and /etc/dhcp/dhcpd.conf both must be configured inorder for ltsp to work.
+To build a fat client refer to the ltsp-build-client.conf file
+The next step will take awhile depending on you machine hardware and internet connection.
+Then finally run:
+sudo ltsp-build-client
+If you are using an additional NIC for the ltsp clients you must refer to:
+https://help.ubuntu.com/community/UbuntuLTSP/ThinClientHowtoNAT
+
+References:
+https://help.ubuntu.com/community/UbuntuLTSP/FatClients
+
 To install applications for the images
 http://www.havetheknowhow.com/Configure-the-server/Configure-LTSP.html
 
